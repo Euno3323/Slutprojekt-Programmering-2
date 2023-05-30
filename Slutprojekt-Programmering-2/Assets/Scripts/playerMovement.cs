@@ -10,7 +10,8 @@ public class playerMovement : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private BoxCollider2D boxCollider;
 
-	[Header("Walking and Jumping")]
+    [Header("Walking and Jumping")]
+    [SerializeField] private bool isFacingRight = true;
 	[SerializeField] private float movementSpeed;
     [SerializeField] private float jumpingPower;
     [SerializeField] private float horizontal;
@@ -47,7 +48,12 @@ public class playerMovement : MonoBehaviour
             return;
         }
 
-        if (Input.GetButtonDown("Jump") && isGrounded())
+		if (isFacingRight && horizontal < 0f || !isFacingRight && horizontal > 0f)
+		{
+			Flip();
+		}
+
+		if (Input.GetButtonDown("Jump") && isGrounded())
         {
             Jump();
         }
@@ -79,6 +85,14 @@ public class playerMovement : MonoBehaviour
             return;
         }
 		rb.velocity = new Vector2(horizontal * movementSpeed, rb.velocity.y);   
+	}
+
+    private void Flip() 
+    {
+		isFacingRight = !isFacingRight;
+		Vector3 localScale = transform.localScale;
+		localScale.x *= -1f;
+		transform.localScale = localScale;
 	}
 
     private void Jump() 
@@ -114,7 +128,7 @@ public class playerMovement : MonoBehaviour
 
     private void WallJump() 
     {
-	    rb.velocity = new Vector2(-horizontal * wallJumpingPower.x, wallJumpingPower.y);
+	    rb.velocity = new Vector2(-transform.localScale.x * wallJumpingPower.x, wallJumpingPower.y);
     }
 
     private IEnumerator Dash() 
